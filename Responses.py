@@ -1,7 +1,90 @@
+import textwrap
 from datetime import datetime
 
-def sample_responses(input_text):
-    user_message  = str(input_text).lower()
+# Keep our command messages together
+# Hackish attempt at multiple languages
+cmd_msgs = {
+	"start" : {
+		"EN" : """
+			Hello!
+			"""
+		,"DE" : """
+			Hallo!
+			"""
+		}
 
-    if user_message in ("hello", "hi"):
-        return "Hiya!"
+	,"help" : {
+		"EN":"""
+			Try these commands
+			<pre>
+				/start
+				\t\t Restart.
+
+				/help
+				\t\t This help.
+
+				/upscale
+				\t\t Upscale an image.
+
+				/language DE
+				\t\t Switch to Deutsch.
+			</pre>
+			"""
+		,"DE" : """
+			Diese Befehle ausprobieren.
+			<pre>
+				/starten
+				\t\t Nue Starten.
+
+				/hiflen
+				\t\t Diese hilfen.
+
+				/skalieren
+				\t\t Bildteil vergrößern.
+
+				/sprache EN
+				\t\t Wechsle auf Deutsch.
+			</pre>
+			"""
+		}
+
+	,"upscale_start" : {
+		"EN" : """
+			Upscaling...
+		"""
+		# =P
+		,"DE" : """
+			Skalierening... 
+		""" 
+		}
+
+	,"upscale_error" : {
+		"EN" : """
+			:( Something went wrong!
+		"""
+		# =P
+		,"DE" : """
+			:( Etwas schief gelaufen! 
+		""" 
+		}
+}
+
+# fix above indentation
+for cmd in cmd_msgs:
+	for lang in cmd_msgs[cmd]:
+		cmd_msgs[cmd][lang] = textwrap.dedent(cmd_msgs[cmd][lang])
+
+
+# Poor mans chat bot
+def sample_responses(input_text):
+	user_message  = str(input_text).lower()
+
+	if user_message in ("hello", "hi"):
+		return "Hallo!"
+
+
+	if user_message in ("bye"):
+		return "ZIEL"
+
+
+
