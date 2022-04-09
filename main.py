@@ -1,7 +1,8 @@
 #!/usr/env/python3
 #
-# http://t.me/
+# enhance-bot
 #
+# Telegram bot to upscale images
 #
 
 import logging
