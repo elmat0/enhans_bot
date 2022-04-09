@@ -1,6 +1,4 @@
 
-Constants.py
-
 
 
 
@@ -133,3 +131,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+Constants.py
