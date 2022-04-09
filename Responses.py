@@ -13,12 +13,8 @@ from datetime import datetime
 # Hackish attempt at multiple languages
 cmd_msgs = {
 	"start" : {
-		"EN" : """
-			Hello!
-			"""
-		,"DE" : """
-			Hallo!
-			"""
+		"EN" : "Hello!"
+		,"DE" : "Hallo!"
 		}
 
 	,"help" : {
@@ -57,23 +53,13 @@ cmd_msgs = {
 		}
 
 	,"upscale_start" : {
-		"EN" : """
-			Upscaling...
-		"""
-		# =P
-		,"DE" : """
-			Skalierening... 
-		""" 
+		"EN" : "Upscaling..."
+		,"DE" : "Skalierening..."  # heh
 		}
 
 	,"upscale_error" : {
-		"EN" : """
-			:( Something went wrong!
-		"""
-		# =P
-		,"DE" : """
-			:( Etwas schief gelaufen! 
-		""" 
+		"EN" : ":( Something went wrong!"
+		,"DE" : ":( Etwas schief gelaufen!" 
 		}
 }
 
