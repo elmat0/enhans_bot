@@ -11,6 +11,7 @@ from datetime import datetime
 
 # Keep our command messages together
 # Hackish attempt at multiple languages
+# TODO: this is probably nicer stored externally as yaml
 cmd_msgs = {
 	"start" : {
 		"EN" : "Hello!"
@@ -27,11 +28,12 @@ cmd_msgs = {
 				/help
 				\t\t This help.
 
+				/settings
+				\t\t Configure default settings.
+
 				/upscale
 				\t\t Upscale an image.
 
-				/language DE
-				\t\t Switch to Deutsch.
 			</pre>
 			"""
 		,"DE" : """
@@ -43,10 +45,30 @@ cmd_msgs = {
 				/hiflen
 				\t\t Diese hilfen.
 
+				/einstellungen
+				\t\t Konfigurieren von Standardeinstellungen.
+
 				/skalieren
 				\t\t Bildteil vergrößern.
 
-				/sprache EN
+			</pre>
+			"""
+		}
+	,"settings" : {
+		
+		"EN" : """
+			Settings:
+			<pre>
+				/language [EN|DE]
+				\t\t Change language.
+			</pre>
+			"""
+
+		
+		,"DE" : """
+			Einstellungen:
+			<pre>
+				/sprache [EN|DE]
 				\t\t Wechsle auf Deutsch.
 			</pre>
 			"""
@@ -58,8 +80,18 @@ cmd_msgs = {
 		}
 
 	,"upscale_error" : {
-		"EN" : ":( Something went wrong!"
-		,"DE" : ":( Etwas schief gelaufen!" 
+		"EN" : "🙁 Something went wrong!"
+		,"DE" : "🙁 Etwas schief gelaufen!" 
+		}
+	,
+	"language_select" : {
+		"EN" : "Select Language:"
+		,"DE" : "Select Language:"  # TODO
+		}
+	,
+	"language_set" : {
+		"EN" : "Language set to EN!"
+		,"DE" : "Language set to DE!"  # TODO
 		}
 }
 
