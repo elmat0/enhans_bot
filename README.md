@@ -8,7 +8,7 @@ Telegram bot to upscale images based on:
 
 
 
-# Installation
+### Installation
 
 Assuming you have git / docker.
 
