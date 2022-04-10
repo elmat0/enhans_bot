@@ -14,11 +14,13 @@ from datetime import datetime
 # HTML / Emojis should work
 cmd_msgs = {
 	"start" : {
-		"EN" : "Send me an image to upscale."
+		"EN" : """Ja hallo my name is Hans!
+			Ich kann upskalieren zee images!"""
 		}
 	,"help" : {
 		"EN":"""
-			Send me an image to upscale or try these commands:
+			Send an image to upscale,
+			or try these commands:
 			<pre>
 				/start
 				\t\t Restart.
@@ -28,14 +30,20 @@ cmd_msgs = {
 			</pre>
 			"""
 		}
+	,"upscale_download" : {
+		"EN" : "⏳ Downloading Image..."
+		}
 	,"upscale_start" : {
 		"EN" : "⏳ Upscaling..."
 		}
+	,"upscale_upload" : {
+		"EN" : "⏳ Uploading Result..."
+		}
 	,"upscale_end" : {
-		"EN" : "⌛ Done!"
+		"EN" : "⌛ Success!"
 		}
 	,"upscale_error" : {
-		"EN" : "💥 Something went wrong..."
+		"EN" : "💥 Something went wrong!"
 		}
 }
 

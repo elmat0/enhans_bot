@@ -64,37 +64,50 @@ def handle_photo(update, context):
 	""" Handle and upscale an image
 		TODO This needs proper job_queue implementation
 	"""
-	message_info = send_response(update,context,"upscale_start")
-
+	
 	photos = update.message.photo
+	
 	if photos:
+		# if we really have photos select largest
 		file_unique_id = photos[-1]['file_unique_id']
 		image_file = photos[-1].get_file()
 
+		# setup some filepaths
 		if not os.path.exists("img"):
 			os.mkdir("img")
-
 		src_file = f"img/{file_unique_id}.png"
 		dst_file = f"img/{file_unique_id}_x2.png"
 
+
+		# pin a single chat / message ID to use for status updates
+		# then download image
+		message_info = send_response(update,context,"upscale_download")
+		chat_id = message_info['chat_id']
+		message_id = message_info['message_id']
+
 		image_file.download(custom_path=src_file)
 
-		# # upscale
+		# upscale image
+		send_response(update,context,"upscale_start", 
+			mode="edit"	,chat_id=chat_id ,message_id=message_id)
 		if os.path.isfile(src_file):
+			# <MAGIC HAPPENS>
 		 	os.system(f"convert {src_file} -resize 200% {dst_file}")
-		#InputMediaPhoto
-		# upload
-				# chat_id=update.effective_chat.id
-				# ,message_id=message_idupdate.message.message_id
-		
-		send_response(update,context,"upscale_end", mode="edit"
-			,chat_id=message_info['chat_id']
-			,message_id=message_info['message_id'])
+			# </MAGIC HAPPENS>
+
+		# send image to chat and update status
+		send_response(update,context,"upscale_upload", 
+			mode="edit"	,chat_id=chat_id ,message_id=message_id)
+		if os.path.isfile(dst_file):
+			context.bot.send_document(chat_id=message_info['chat_id']
+				, document=open(dst_file, 'rb'))
+			send_response(update,context,"upscale_end", 
+				mode="edit"	,chat_id=chat_id ,message_id=message_id)
+
 	else:
 		send_response(update,context,"upscale_error", mode="edit"
 			,chat_id=message_info['chat_id']
 			,message_id=message_info['message_id'])
-
 
 
 def handle_error(update, context):
