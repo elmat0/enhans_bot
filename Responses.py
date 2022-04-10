@@ -31,7 +31,7 @@ cmd_msgs = {
 	,"upscale_start" : {
 		"EN" : "⏳ Upscaling..."
 		}
-	,"upscale_done" : {
+	,"upscale_end" : {
 		"EN" : "⌛ Done!"
 		}
 	,"upscale_error" : {
