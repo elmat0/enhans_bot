@@ -14,7 +14,7 @@ from datetime import datetime
 # HTML / Emojis should work
 cmd_msgs = {
 	"start" : {
-		"EN" : "Hello!"
+		"EN" : "Send me an image to upscale."
 		}
 	,"help" : {
 		"EN":"""
