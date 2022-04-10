@@ -6,4 +6,7 @@
 #
 # Store config variables here
 
+# Hide changes to this file like so
+# git update-index --assume-unchanged Constants.py
+
 API_KEY=''
