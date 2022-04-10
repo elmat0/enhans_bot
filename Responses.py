@@ -11,12 +11,11 @@ from datetime import datetime
 
 # Keep our command messages together
 # Hackish attempt at multiple languages
+# HTML / Emojis should work
 cmd_msgs = {
 	"start" : {
 		"EN" : "Hello!"
-		,"DE" : "Hallo!"
 		}
-
 	,"help" : {
 		"EN":"""
 			Try these commands
@@ -27,39 +26,17 @@ cmd_msgs = {
 				/help
 				\t\t This help.
 
-				/upscale
-				\t\t Upscale an image.
-
-				/language DE
-				\t\t Switch to Deutsch.
-			</pre>
-			"""
-		,"DE" : """
-			Diese Befehle ausprobieren.
-			<pre>
-				/starten
-				\t\t Nue Starten.
-
-				/hiflen
-				\t\t Diese hilfen.
-
-				/skalieren
-				\t\t Bildteil vergrößern.
-
-				/sprache EN
-				\t\t Wechsle auf Deutsch.
 			</pre>
 			"""
 		}
-
 	,"upscale_start" : {
-		"EN" : "Upscaling..."
-		,"DE" : "Skalierening..."  # heh
+		"EN" : "⏳ Upscaling..."
 		}
-
+	,"upscale_done" : {
+		"EN" : "⌛ Done!"
+		}
 	,"upscale_error" : {
-		"EN" : ":( Something went wrong!"
-		,"DE" : ":( Etwas schief gelaufen!" 
+		"EN" : "💥 Something went wrong..."
 		}
 }
 
@@ -73,12 +50,5 @@ for cmd in cmd_msgs:
 def sample_responses(input_text):
 	user_message  = str(input_text).lower()
 
-	if user_message in ("hello", "hi"):
+	if user_message in ("hello", "hi", "hey", "gday"):
 		return "Hallo!"
-
-
-	if user_message in ("bye"):
-		return "ZIEL"
-
-
-
