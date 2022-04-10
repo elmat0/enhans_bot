@@ -42,11 +42,11 @@ def handle_text(update, context):
 
 
 def handle_photo(update, context):
-    send_msg(update,context,"upscale_start")
-    print("upscale function goes here")
+	send_msg(update,context,"upscale_start")
+	print("upscale function goes here")
 	send_msg(update,context,"upscale_end")
-    error = True
-    if error:
+	error = True
+	if error:
         send_msg(update,context,"upscale_error")
 
 
