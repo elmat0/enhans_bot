@@ -1,6 +1,6 @@
 #!/usr/env/python3
 #
-# enhance-bot
+# enhans_bot
 #
 # Telegram bot to upscale images
 #
@@ -14,7 +14,8 @@ from datetime import datetime
 # HTML / Emojis should work
 cmd_msgs = {
 	"start" : {
-		"EN" : """Ja hallo my name is Hans!
+		"EN" : """
+			Ja hallo my name is Hans!
 			Ich kann upskalieren zee images!"""
 		}
 	,"help" : {

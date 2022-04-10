@@ -1,6 +1,6 @@
-# enhance-bot
+# enhans_bot
 
-Ja hallo my name is Hans. Vee are looking for zee arms.
+Ja hallo my name is Hans.
 
 Telegram bot to upscale images based on:
 * https://python-telegram-bot.org/

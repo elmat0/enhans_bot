@@ -1,9 +1,10 @@
 #!/usr/env/python3
 #
-# enhance-bot
+# enhans_bot
 #
 # Telegram bot to upscale images
 #
+# Main logic loop goes here
 
 import os
 import logging
