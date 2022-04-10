@@ -18,14 +18,13 @@ cmd_msgs = {
 		}
 	,"help" : {
 		"EN":"""
-			Try these commands
+			Send me an image to upscale or try these commands:
 			<pre>
 				/start
 				\t\t Restart.
 
 				/help
 				\t\t This help.
-
 			</pre>
 			"""
 		}

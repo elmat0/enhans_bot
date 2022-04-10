@@ -9,7 +9,7 @@ import logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                      level=logging.INFO)
 
-from telegram import Update, InlineQueryResultArticle, InputTextMessageContent
+from telegram import Update, InlineQueryResultArticle, InputTextMessageContent, InputMediaPhoto
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, InlineQueryHandler
 import Constants as keys
 import Responses as R
@@ -29,43 +29,25 @@ def send_msg(update, context, msg):
 
 def cmd_start(update, context):
     send_msg(update,context,"start")
-    
+
 
 def cmd_help(update, context):
     send_msg(update,context,"help")
-   
-
-def cmd_upscale(update, context):
-    send_msg(update,context,"upscale_start")
-    print("upscale function goes here")
-    error = True
-    if error:
-        send_msg(update,context,"upscale_error")
 
 
-def cmd_inline_caps(update, context):
-    query = update.inline_query.query
-    if not query:
-        return
-    results = []
-    results.append(
-        InlineQueryResultArticle(
-            id=query.upper(),
-            title='Caps',
-            input_message_content=InputTextMessageContent(query.upper())
-        )
-    )
-    context.bot.answer_inline_query(update.inline_query.id, results)
-
-
-def cmd_set_language(update, context):
-    pass
-
-
-def handle_message(update, context):
+def handle_text(update, context):
     text = str(update.message.text).lower()
     response = R.sample_responses(text)
     update.message.reply_text(response)
+
+
+def handle_photo(update, context):
+    send_msg(update,context,"upscale_start")
+    print("upscale function goes here")
+	send_msg(update,context,"upscale_end")
+    error = True
+    if error:
+        send_msg(update,context,"upscale_error")
 
 
 def handle_error(update, context):
@@ -75,14 +57,11 @@ def handle_error(update, context):
 def main():
     updater = Updater(keys.API_KEY, use_context=True)
     dp = updater.dispatcher
-    dp.add_handler(CommandHandler(["start","starten"], cmd_start))
-    dp.add_handler(CommandHandler(["help","hilfen"], cmd_help))
-    dp.add_handler(CommandHandler(["upscale","skalieren"], cmd_upscale))
-    dp.add_handler(CommandHandler(["language","sprache"], cmd_set_language))
-    dp.add_handler(InlineQueryHandler(cmd_inline_caps))
+    dp.add_handler(CommandHandler(["start"], cmd_start))
+    dp.add_handler(CommandHandler(["help"], cmd_help))
+    dp.add_handler(MessageHandler(Filters.text, handle_text))
+	dp.add_handler(MessageHandler(Filters.photo, handle_photo))
 
-
-    dp.add_handler(MessageHandler(Filters.text, handle_message))
     dp.add_error_handler(handle_error)
 
     updater.start_polling()
