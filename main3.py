@@ -58,7 +58,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 conn = sqlite3.connect(CORPUS_DB)
-
 conn.execute("""
     CREATE TABLE IF NOT EXISTS links (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -100,8 +99,8 @@ Try these commands:
 <b>/question, /q [some text]</b>
 <pre>Ask me a question.</pre>
 
-<b>/query_image, /qi [some text] + [image]</b>
-<pre>Ask me a question about an image.</pre>
+<b>/caption_image, /ci [image]</b>
+<pre>Let me tell you what I see.</pre>
 
 <i>{VERSION}</i>
 """
@@ -110,6 +109,12 @@ Try these commands:
 
 @send_action(ChatAction.UPLOAD_PHOTO)
 async def caption_image_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    print(update)
+    image_path = update.message.effective_attachment[-1].get_file()
+    print(image_path)
+    await image_path.download_to_drive('new_file_001')
+
+    image_path = "https://i.redd.it/k2qcdisoy71b1.jpg"
     captioner = pipeline("image-to-text", model=CAPTION_MODEL, max_new_tokens=50, device=CAPTION_DEVICE, use_fast=True)
     caption = captioner(image_path)[0]['generated_text']
     print(image_path, caption)
@@ -124,10 +129,6 @@ async def query_image_command(update: Update, context: ContextTypes.DEFAULT_TYPE
     question = " ".join(context.args)
     question = f"{question}?"
     if question != "?":
-        #cursor = conn.execute('SELECT summary_long FROM links')
-        #knowledge = "".join([y for x in cursor.fetchall() for y in x])
-        #answer = qa_model(question = question, context = knowledge)["answer"]
-
         nlp = pipeline(
             "document-question-answering",
             model=QUERY_IMAGE_MODEL
@@ -196,7 +197,7 @@ async def summary_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             summary_short = generate_summary(scrape["title"])
         if len(scrape["text"]) > 0:
             summary_long = generate_summary(scrape["text"])
-        print(url)
+        #TODO prevent dups
         #cursor = conn.execute("SELECT url from links where url like '?'",(url))
         #if cursor.fetchall()[0] != url:
         #print('new info')
@@ -207,15 +208,6 @@ async def summary_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         #else: 
         #    print('old info')
     await update.message.reply_text(textwrap.dedent(answer))
-
-
-
-
-
-
-
-
-
 
 
 @send_action(ChatAction.UPLOAD_VIDEO)
@@ -230,24 +222,6 @@ async def txt2vid_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     # print('output_video_path:', output_video_path)
 
     
-
-    inputs = ['text']
-    outputs = ['video']
-
-    if not is_accelerate_available():
-        raise ImportError("Accelerate should be installed in order to use tools.")
-
-
-    device = get_default_device()
-
-    pipeline = DiffusionPipeline.from_pretrained(
-        TXT2VID_MODEL, variant="fp16"
-    )
-    pipeline.to(device)
-
-    video = pipeline(prompt, num_frames=8 * seconds).frames
-
-    print(video)
     # pipe = DiffusionPipeline.from_pretrained("damo-vilab/text-to-video-ms-1.7b", torch_dtype=torch.float16, variant="fp16")
     # pipe.scheduler = DPMSolverMultistepScheduler.from_config(pipe.scheduler.config)
     # pipe.enable_model_cpu_offload()
@@ -287,7 +261,8 @@ def main() -> None:
     application.add_handler(CommandHandler("ci", caption_image_command))
 
     # handle specific message types
-    application.add_handler(MessageHandler(filters.PHOTO, query_image_command))
+    application.add_handler(MessageHandler(filters.PHOTO, caption_image_command))
+    application.add_handler(MessageHandler(filters.PHOTO & filters.TEXT, query_image_command))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, question_command))
 
     # Run the bot until the user presses Ctrl-C
