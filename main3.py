@@ -38,7 +38,6 @@ CORPUS_DB = "corpus.db"
 SUMMARY_MODEL = "knkarthick/MEETING_SUMMARY"
 SUMMARY_MIN_LENGTH = 16
 SUMMARY_MAX_LENGTH = 1024
-
 CAPTION_MODELS = {
     'blip-base': 'Salesforce/blip-image-captioning-base',
     'blip-large': 'Salesforce/blip-image-captioning-large',
@@ -46,15 +45,11 @@ CAPTION_MODELS = {
     'blip2-flan-t5-xl': 'Salesforce/blip2-flan-t5-xl',
     'vit-gpt2-coco-en':'ydshieh/vit-gpt2-coco-en',
 }
-
-QUESTION_MODEL = "deepset/roberta-base-squad2"
-
 CAPTION_MODEL = CAPTION_MODELS['blip-base']
 CAPTION_DEVICE = "cpu"
-
+QUESTION_MODEL = "deepset/roberta-base-squad2"
 QUERY_IMAGE_MODEL = "impira/layoutlm-document-qa"
-
-
+TXT2VID_MODEL="damo-vilab/text-to-video-ms-1.7b"
 
 # GO ----------------------------------------------------------------------------------
 # Enable logging
@@ -234,7 +229,7 @@ async def txt2vid_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     # output_video_path = generator(test_text,)[OutputKeys.OUTPUT_VIDEO]
     # print('output_video_path:', output_video_path)
 
-    default_checkpoint = "damo-vilab/text-to-video-ms-1.7b"
+    
 
     inputs = ['text']
     outputs = ['video']
@@ -246,7 +241,7 @@ async def txt2vid_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     device = get_default_device()
 
     pipeline = DiffusionPipeline.from_pretrained(
-        default_checkpoint, variant="fp16"
+        TXT2VID_MODEL, variant="fp16"
     )
     pipeline.to(device)
 
