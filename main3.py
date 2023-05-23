@@ -47,6 +47,8 @@ CAPTION_MODELS = {
     'vit-gpt2-coco-en':'ydshieh/vit-gpt2-coco-en',
 }
 
+QUESTION_MODEL = "deepset/roberta-base-squad2"
+
 CAPTION_MODEL = CAPTION_MODELS['blip-base']
 CAPTION_DEVICE = "cpu"
 
@@ -121,7 +123,7 @@ async def caption_image_command(update: Update, context: ContextTypes.DEFAULT_TY
 
 @send_action(ChatAction.TYPING)
 async def query_image_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """What have we learnt?"""
+    """What is happening in this pic?"""
     print(context.args)
     answer = "Give me an image and a question."
     question = " ".join(context.args)
@@ -137,6 +139,7 @@ async def query_image_command(update: Update, context: ContextTypes.DEFAULT_TYPE
         )
         print (nlp)
         answer = nlp(
+            #TODO pass in real image
             "https://i.redd.it/k2qcdisoy71b1.jpg",
             question
         )
@@ -146,7 +149,7 @@ async def query_image_command(update: Update, context: ContextTypes.DEFAULT_TYPE
 @send_action(ChatAction.TYPING)
 async def question_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """What have we learnt?"""
-    qa_model = pipeline("question-answering","deepset/roberta-base-squad2")
+    qa_model = pipeline("question-answering",QUESTION_MODEL)
     question = " ".join(context.args)
     question = f"{question}?"
     answer = "Ask me a question."
@@ -156,25 +159,11 @@ async def question_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         answer = qa_model(question = question, context = knowledge)["answer"]
     await update.message.reply_text(answer)
 
-
-# async def chat_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-#     """What have we learnt?"""
-#     chat_model = pipeline("question-answering")
-#     question = "".join(context.args)
-#     question = f"{question}?"
-#     answer = "Ask me a question."
-#     if question != "":
-#         cursor = conn.execute('SELECT summary_long FROM links')
-#         knowledge = "".join([y for x in cursor.fetchall() for y in x])
-#         answer = qa_model(question = question, context = knowledge)["answer"]
-#     await update.message.reply_text(f"{answer}")
-
-
-# async def corpus_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-#     """Provide insights into bots knowledge / bias"""
-#     cursor = conn.execute('SELECT id, article_title FROM links')
-#     corpus = cursor.fetchall()
-#     await update.message.reply_text(f"{corpus}")
+async def corpus_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Provide insights into bots knowledge / bias"""
+    cursor = conn.execute('SELECT id, article_title FROM links')
+    corpus = cursor.fetchall()
+    await update.message.reply_text(f"{corpus}")
 
 @send_action(ChatAction.TYPING)
 async def summary_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
