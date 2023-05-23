@@ -31,7 +31,7 @@ import logging
 from functools import wraps
 logging.getLogger("transformers").setLevel(logging.ERROR)
 
-VERSION = "v0.0.4"
+VERSION = "v0.0.5"
 CORPUS_DB = "corpus.db"
 
 # MODELS
@@ -88,7 +88,10 @@ def send_action(action):
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /help is issued."""
     message = f"""<b>Salute!</b>🍻 
-Try these commands:
+
+<pre>Send me an image and I'll tell you what I see.</pre>
+
+Or try these commands:
 
 <b>/start, /help</b>
 <pre>This.</pre>
@@ -99,9 +102,6 @@ Try these commands:
 <b>/question, /q [some text]</b>
 <pre>Ask me a question.</pre>
 
-<b>/caption_image, /ci [image]</b>
-<pre>Let me tell you what I see.</pre>
-
 <i>{VERSION}</i>
 """
     await update.message.reply_html(textwrap.dedent(message))
@@ -109,15 +109,11 @@ Try these commands:
 
 @send_action(ChatAction.UPLOAD_PHOTO)
 async def caption_image_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print(update)
-    print(context)
-    print(context.args)
     answer = "unknown"
     image_file = await update.message.photo[-1].get_file()
-    print(image_file.file_path)
+    print(image_file)
     captioner = pipeline("image-to-text", model=CAPTION_MODEL, max_new_tokens=50, device=CAPTION_DEVICE, use_fast=True)
     caption = captioner(image_file.file_path)
-    print(caption)
     if caption[0]['generated_text']:
         answer = caption[0]['generated_text']
     await update.message.reply_text(answer)
