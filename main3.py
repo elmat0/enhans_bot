@@ -110,15 +110,17 @@ Try these commands:
 @send_action(ChatAction.UPLOAD_PHOTO)
 async def caption_image_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     print(update)
-    image_path = update.message.effective_attachment[-1].get_file()
-    print(image_path)
-    await image_path.download_to_drive('new_file_001')
-
-    image_path = "https://i.redd.it/k2qcdisoy71b1.jpg"
+    print(context)
+    print(context.args)
+    answer = "unknown"
+    image_file = await update.message.photo[-1].get_file()
+    print(image_file.file_path)
     captioner = pipeline("image-to-text", model=CAPTION_MODEL, max_new_tokens=50, device=CAPTION_DEVICE, use_fast=True)
-    caption = captioner(image_path)[0]['generated_text']
-    print(image_path, caption)
-    await update.message.reply_text(caption)
+    caption = captioner(image_file.file_path)
+    print(caption)
+    if caption[0]['generated_text']:
+        answer = caption[0]['generated_text']
+    await update.message.reply_text(answer)
 
 
 @send_action(ChatAction.TYPING)
