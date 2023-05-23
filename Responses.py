@@ -10,7 +10,6 @@ import textwrap
 from datetime import datetime
 
 # Keep our command messages together
-# Hackish attempt at multiple languages
 # HTML / Emojis should work
 cmd_msgs = {
 	"start" : {
@@ -46,6 +45,12 @@ cmd_msgs = {
 	,"upscale_error" : {
 		"EN" : "💥 Something went wrong!"
 		}
+	,"summarise_start" : {
+		"EN" : "⏳ Summarising..."
+	}
+	,"summarise_end" : {
+		"EN" : "⏳ Summarising..."
+	}
 }
 
 # fix above indentation

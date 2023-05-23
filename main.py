@@ -11,8 +11,8 @@ import logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
 					 level=logging.INFO)
 
-from telegram import Update, InlineQueryResultArticle, InputTextMessageContent, InputMediaPhoto, File
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, InlineQueryHandler
+#from telegram import #InlineQueryResultArticle, InputTextMessageContent, InputMediaPhoto, File
+from telegram import Update, CommandHandler, MessageHandler, Filters, CallbackContext, InlineQueryHandler
 import Constants as keys
 import Responses as R
 
@@ -26,9 +26,7 @@ def get_response_text(update, context, msg):
 		logging.error(f"msg not found - {msg}")
 
 def send_response(update, context, msg, mode="send", chat_id=None, message_id=None):
-
 	text = get_response_text(update, context, msg)
-
 	if text:
 		if mode == "send":
 			heh = context.bot.send_message(
@@ -71,6 +69,7 @@ def handle_photo(update, context):
 	if photos:
 		# if we really have photos select largest
 		file_unique_id = photos[-1]['file_unique_id']
+		file_height = photos[-1]['height']
 		image_file = photos[-1].get_file()
 
 		# setup some filepaths
@@ -93,7 +92,21 @@ def handle_photo(update, context):
 			mode="edit"	,chat_id=chat_id ,message_id=message_id)
 		if os.path.isfile(src_file):
 			# <MAGIC HAPPENS>
-		 	os.system(f"convert {src_file} -resize 200% {dst_file}")
+			# os.system(
+			# 	"docker run -it --rm "+				# remove the container when done
+    		# 	"--gpus all "+						# mount and enable the GPU (NVIDIA)
+    		# 	"-v $PWD:/host "+					# bind the image directory as the container's /host
+    		# 	f"{keys.VIDEO2X_DOCKER} "+			# the container image's URL and tag (e.g., 5.0.0-cuda)
+    		# 	f"-i {src_file} -o {dst_file} "+	# input and output file path
+    		# 	"-p3 "+								# launch 3 processes
+    		# 	"upscale "+							# set mode to upscale (the other is interpolate)
+    		# 	f"-h {file_height * 2:d} "+			# set output height (aspect ratio is preserved)
+    		# 	"-a waifu2x "+						# use waifu2x to upscale
+    		# 	"-n3 "								# set noise level to 3
+			# )
+			# print(dst_file)
+
+			os.system(f"convert {src_file} -resize 200% {dst_file}")
 			# </MAGIC HAPPENS>
 
 		# send image to chat and update status
@@ -116,8 +129,8 @@ def handle_error(update, context):
 
 
 def main():
-	updater = Updater(keys.API_KEY, use_context=True)
-	dp = updater.dispatcher
+	#updater = Update(keys.API_KEY, use_context=True)
+	#dp = updater.dispatcher
 
 	dp.add_handler(CommandHandler(["start"], cmd_start))
 	dp.add_handler(CommandHandler(["help"], cmd_help))
