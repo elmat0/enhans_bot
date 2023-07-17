@@ -9,6 +9,8 @@ import Constants as keys
 import logging
 from html import escape
 from uuid import uuid4
+import telegram
+from telegram.ext import filters, MessageHandler, Application, CommandHandler, ContextTypes, InlineQueryHandler
 from telegram import InlineQueryResultArticle, InputTextMessageContent, Update
 from telegram.constants import ParseMode, ChatAction
 import torch
@@ -19,8 +21,6 @@ from transformers.tools.base import Tool, get_default_device
 from transformers.utils import is_accelerate_available
 
 from diffusers import DiffusionPipeline
-
-from telegram.ext import filters, MessageHandler, Application, CommandHandler, ContextTypes, InlineQueryHandler
 import sqlite3
 import requests
 from bs4 import BeautifulSoup
@@ -106,12 +106,25 @@ Or try these commands:
 """
     await update.message.reply_html(textwrap.dedent(message))
 
-
 @send_action(ChatAction.UPLOAD_PHOTO)
 async def caption_image_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    logging.info("""Caption Image""")
     answer = "unknown"
     image_file = await update.message.photo[-1].get_file()
-    print(image_file)
+    logging.info(image_file)
+    captioner = pipeline("image-to-text", model=CAPTION_MODEL, max_new_tokens=50, device=CAPTION_DEVICE, use_fast=True)
+    caption = captioner(image_file.file_path)
+    if caption[0]['generated_text']:
+        answer = caption[0]['generated_text']
+    await update.message.reply_text(answer)
+
+
+@send_action(ChatAction.UPLOAD_PHOTO)
+async def zero_shot_image_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    answer = "unknown"
+    image_file = await update.message.photo[-1].get_file()
+    logging.info(context.args)
+    logging.info(image_file)
     captioner = pipeline("image-to-text", model=CAPTION_MODEL, max_new_tokens=50, device=CAPTION_DEVICE, use_fast=True)
     caption = captioner(image_file.file_path)
     if caption[0]['generated_text']:
@@ -120,48 +133,30 @@ async def caption_image_command(update: Update, context: ContextTypes.DEFAULT_TY
 
 
 @send_action(ChatAction.TYPING)
-async def query_image_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """What is happening in this pic?"""
-    print(context.args)
-    answer = "Give me an image and a question."
-    question = " ".join(context.args)
-    question = f"{question}?"
-    if question != "?":
-        nlp = pipeline(
-            "document-question-answering",
-            model=QUERY_IMAGE_MODEL
-        )
-        print (nlp)
-        answer = nlp(
-            #TODO pass in real image
-            "https://i.redd.it/k2qcdisoy71b1.jpg",
-            question
-        )
-        print(answer)
-    await update.message.reply_text(answer)
-
-@send_action(ChatAction.TYPING)
 async def question_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """What have we learnt?"""
+    logging.info("""What have we learnt?""")
     qa_model = pipeline("question-answering",QUESTION_MODEL)
-    question = " ".join(context.args)
+    question = ""
+    if context.args:
+        question = " ".join(context.args)
     question = f"{question}?"
     answer = "Ask me a question."
     if question != "?":
-        cursor = conn.execute('SELECT summary_long FROM links')
+        cursor = conn.execute('SELECT article_text FROM links')
         knowledge = "".join([y for x in cursor.fetchall() for y in x])
         answer = qa_model(question = question, context = knowledge)["answer"]
     await update.message.reply_text(answer)
 
+@send_action(ChatAction.TYPING)
 async def corpus_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Provide insights into bots knowledge / bias"""
+    logging.info("Provide insights into bots knowledge / bias""")
     cursor = conn.execute('SELECT id, article_title FROM links')
     corpus = cursor.fetchall()
     await update.message.reply_text(f"{corpus}")
 
 @send_action(ChatAction.TYPING)
 async def summary_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Summarise a website via URL"""
+    logging.info("Summarise a website via URL""")
 
 
     def scrape_web_article(url):
@@ -198,18 +193,18 @@ async def summary_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         #TODO prevent dups
         #cursor = conn.execute("SELECT url from links where url like '?'",(url))
         #if cursor.fetchall()[0] != url:
-        #print('new info')
+        #logging.info('new info')
         conn.execute('INSERT INTO links (url, article_title, article_text, summary_short, summary_long) VALUES (?, ?, ?, ?, ?)', 
                     (url, scrape["title"], scrape["text"], summary_short, summary_long))
         conn.commit()
         answer = summary_long
         #else: 
-        #    print('old info')
+        #    logging.info('old info')
     await update.message.reply_text(textwrap.dedent(answer))
 
 
 @send_action(ChatAction.UPLOAD_VIDEO)
-async def txt2vid_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def txt2video_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     # generator = pipeline("summarization", model='damo-vilab/modelscope-damo-text-to-video-synthesis')
 
@@ -217,7 +212,7 @@ async def txt2vid_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     #         'text': 'A panda eating bamboo on a rock.',
     #     }
     # output_video_path = generator(test_text,)[OutputKeys.OUTPUT_VIDEO]
-    # print('output_video_path:', output_video_path)
+    # logging.info('output_video_path:', output_video_path)
 
     
     # pipe = DiffusionPipeline.from_pretrained("damo-vilab/text-to-video-ms-1.7b", torch_dtype=torch.float16, variant="fp16")
@@ -227,12 +222,16 @@ async def txt2vid_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     # prompt = "Spiderman is surfing"
     # video_frames = pipe(prompt, num_inference_steps=25).frames
     # video_path = export_to_video(video_frames)
-    # print(video_path)
-
+    # logging.info(video_path)
+    video = Audio("https://matmilne.com/spaceballs/music1.wav")
     await update.message.reply_video(video)
 
 
 
+@send_action(ChatAction)
+async def txt2audio_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    audio = Audio("https://matmilne.com/spaceballs/music1.wav")
+    await update.message.reply_audio(audio)
 
 
 
@@ -241,7 +240,7 @@ async def txt2vid_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
 
 def main() -> None:
-    """Run the bot."""
+    logging.info("Run the bot.""")
     # Create the Application and pass it your bot's token.
     application = Application.builder().token(keys.API_KEY).build()
 
@@ -252,15 +251,11 @@ def main() -> None:
     application.add_handler(CommandHandler("s", summary_command))
     application.add_handler(CommandHandler("question", question_command))
     application.add_handler(CommandHandler("q", question_command))
-    application.add_handler(CommandHandler("query_image", question_command))
-    application.add_handler(CommandHandler("qi", query_image_command))
-    application.add_handler(CommandHandler("t2v", txt2vid_command))
-    application.add_handler(CommandHandler("caption_image", caption_image_command))
-    application.add_handler(CommandHandler("ci", caption_image_command))
+    application.add_handler(CommandHandler("t2v", txt2vidio_command))
+    application.add_handler(CommandHandler("t2a", txt2audio_command))
 
     # handle specific message types
-    application.add_handler(MessageHandler(filters.PHOTO, caption_image_command))
-    application.add_handler(MessageHandler(filters.PHOTO & filters.TEXT, query_image_command))
+    application.add_handler(MessageHandler(filters.PHOTO & ~filters.TEXT, caption_image_command))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, question_command))
 
     # Run the bot until the user presses Ctrl-C
