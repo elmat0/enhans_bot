@@ -18,5 +18,5 @@ Add API key to `Constants.py`
 
 Start bot
 ```
-python3 main3.py
+python3 run.py
 ```
